@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="A single HTML file pomodoro timer">
+        <meta name="author" content="Pedro Howat <github.com/phowat/tomatoGears>">
+        <title>Tomato Gears</title>
+
+        <!-- Bootstrap core CSS -->
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+
+        <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    </head>
+
+    <body ng-app="tomatoGears">
+
+        <div class="container starter-template" ng-controller="PomodoroTimerCtrl">
+            <div class="row">
+               <div class="form-group">
+                   <label for="activityDesc">Activity</label>
+                   <input type="email" class="form-control" id="activityDesc" placeholder="Ex: Finishing the layout of feature X.">
+               </div>
+               {{ stopwatch.data.value | secToTime }} <br> {{ stopwatch.data.laps | json }}
+               <div class="btn-group">
+                   <button type="button" class="btn btn-default" ng-click="start()">Start</button>
+                   <button type="button" class="btn btn-default">Long Break</button>
+                   <button type="button" class="btn btn-default">Short Break</button>
+               </div>
+                <div>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Start Time</th>
+                            <th>Description</th>
+                            <th>Pomodoros</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td> {{ pomodoro.startTS }} </td>
+                            <td>fdsalk fdaskjlhfkdsa fhsda hfsdakj </td>
+                            <td>O X X X X X X </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div><!-- /.container -->
+    </body>
+    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        var tomatoGears = angular.module('tomatoGears', []);
+
+        tomatoGears.factory('PomodoroData', function () {
+            return {
+                startTS: 0,
+                pomodoroDuration: 1500,
+                shortBreakDuration: 300,
+                longBreakDuration: 1200
+            };
+        });
+
+        tomatoGears.factory('Timer', function($timeout, PomodoroData) {
+
+            var data = {
+                        value: 0,
+                        laps: []
+                    },
+                    stopwatch = null;
+
+            var stop = function () {
+                $timeout.cancel(stopwatch);
+                stopwatch = null;
+            };
+
+            var start = function () {;
+                stopwatch = $timeout(function() {
+                    console.log(data.value, PomodoroData.pomodoroDuration)
+                    data.value = Math.round(new Date().getTime() / 1000) - PomodoroData.startTS;
+                    if (data.value >= PomodoroData.pomodoroDuration) {
+                        stop();
+                    } else {
+                        start();
+                    }
+                }, 100);
+            };
+
+            var reset = function () {
+                stop()
+                data.value = 0;
+                data.laps = [];
+            };
+
+            var lap = function () {
+                data.laps.push(data.value);
+            };
+
+            return {
+                data: data,
+                start: start,
+                stop: stop,
+                reset: reset,
+                lap: lap
+            };
+        });
+
+        tomatoGears.filter('secToTime', function() {
+            return function (secs) {
+                return new Date(null, null, null, null, null, secs).
+                    toTimeString().match(/\d{2}:\d{2}:\d{2}/)[0].substring(3);
+            }
+        });
+
+        tomatoGears.controller('PomodoroTimerCtrl', function ($scope, PomodoroData, Timer) {
+            $scope.pomodoro = PomodoroData;
+            $scope.stopwatch = Timer;
+            $scope.start = function () {
+                $scope.pomodoro.startTS = Math.round(new Date().getTime() / 1000);
+                $scope.stopwatch.start();
+            }
+            $scope.abort = function () {
+
+            }
+        });
+    </script>
+</html>
