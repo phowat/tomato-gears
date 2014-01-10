@@ -1,32 +1,31 @@
 <!DOCTYPE html>
-
-<html lang="en">
+<html lang="en" ng-app="tomatoGears">
     <head>
         <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="A single HTML file pomodoro timer">
         <meta name="author" content="Pedro Howat <https://github.com/phowat/tomato-gears>">
         <title>Tomato Gears</title>
 
         <!-- Bootstrap core CSS -->
-        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
-
-        <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
     </head>
 
-    <body ng-app="tomatoGears">
+    <body>
 
-        <div class="container starter-template" ng-controller="PomodoroTimerCtrl">
+        <div class="container" ng-controller="PomodoroTimerCtrl">
             <div class="row">
                <div class="form-group">
-                   <label for="activityDesc">Activity</label>
-                   <input type="email" class="form-control" id="activityDesc" placeholder="Ex: Finishing the layout of feature X.">
+                   <form class="simple-form">
+                       <label for="activityDesc">Activity</label>
+                       <input type="text" class="form-control" ng-model="pomodoro.description" id="activityDesc" placeholder="Ex: Finishing the layout of feature X." required >
+                   </form>
                </div>
-               {{ stopwatch.data.value | secToTime }} <br> {{ stopwatch.data.laps | json }}
+            </div>
+            <div class="row">
+               {{ stopwatch.data.value | secToTime }}
                <div class="btn-group">
-                   <button type="button" class="btn btn-default" ng-click="start()">Start</button>
+                   <button type="button" class="btn btn-default" ng-click="startAbort()">{{ pomodoro.startTS < 1 ? 'Start' : 'Abort' }}</button>
                    <button type="button" class="btn btn-default">Long Break</button>
                    <button type="button" class="btn btn-default">Short Break</button>
                </div>
@@ -51,15 +50,16 @@
             </div>
         </div><!-- /.container -->
     </body>
-    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular.min.js"></script>
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular.min.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
     <script type="text/javascript">
         var tomatoGears = angular.module('tomatoGears', []);
 
         tomatoGears.factory('PomodoroData', function () {
             return {
                 startTS: 0,
+                description: '',
                 pomodoroDuration: 1500,
                 shortBreakDuration: 300,
                 longBreakDuration: 1200
@@ -76,7 +76,12 @@
 
             var stop = function () {
                 $timeout.cancel(stopwatch);
+                PomodoroData.startTs = 0;
                 stopwatch = null;
+            };
+
+            var abort = function () {
+                stop();
             };
 
             var start = function () {
@@ -105,7 +110,8 @@
                 start: start,
                 stop: stop,
                 reset: reset,
-                lap: lap
+                lap: lap,
+                abort: abort
             };
         });
 
@@ -119,9 +125,13 @@
         tomatoGears.controller('PomodoroTimerCtrl', function ($scope, PomodoroData, Timer) {
             $scope.pomodoro = PomodoroData;
             $scope.stopwatch = Timer;
-            $scope.start = function () {
-                $scope.pomodoro.startTS = Math.round(new Date().getTime() / 1000);
-                $scope.stopwatch.start();
+            $scope.startAbort = function () {
+                if ($scope.pomodoro.startTS > 0) {
+                    $scope.stopwatch.abort();
+                } else {
+                    $scope.pomodoro.startTS = Math.round(new Date().getTime() / 1000);
+                    $scope.stopwatch.start();
+                }
             };
             $scope.abort = function () {
 
