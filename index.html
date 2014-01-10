@@ -40,7 +40,7 @@
                         </thead>
                         <tbody ng-repeat="p in pomodoro.pomodoros">
                         <tr>
-                            <td> {{ p.startTS }} </td>
+                            <td> {{ p.startTS | date:'HH:mm:ss' }} </td>
                             <td> {{ p.description }} </td>
                             <td> {{ p.status }} </td>
                         </tr>
@@ -134,9 +134,10 @@
                 if ($scope.pomodoro.startTS > 0) {
                     $scope.stopwatch.abort();
                 } else {
-                    $scope.pomodoro.startTS = Math.round(new Date().getTime() / 1000);
+                    var startDate = new Date();
+                    $scope.pomodoro.startTS = Math.round(startDate.getTime() / 1000);
                     $scope.pomodoro.pomodoros.push({
-                        startTS: $scope.pomodoro.startTS,
+                        startTS: startDate,
                         description: $scope.pomodoro.description,
                         status: "IN_PROGRESS"
                     });
