@@ -6,7 +6,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="A single HTML file pomodoro timer">
-        <meta name="author" content="Pedro Howat <github.com/phowat/tomatoGears>">
+        <meta name="author" content="Pedro Howat <https://github.com/phowat/tomato-gears>">
         <title>Tomato Gears</title>
 
         <!-- Bootstrap core CSS -->
@@ -79,9 +79,8 @@
                 stopwatch = null;
             };
 
-            var start = function () {;
+            var start = function () {
                 stopwatch = $timeout(function() {
-                    console.log(data.value, PomodoroData.pomodoroDuration)
                     data.value = Math.round(new Date().getTime() / 1000) - PomodoroData.startTS;
                     if (data.value >= PomodoroData.pomodoroDuration) {
                         stop();
@@ -92,7 +91,7 @@
             };
 
             var reset = function () {
-                stop()
+                stop();
                 data.value = 0;
                 data.laps = [];
             };
@@ -123,7 +122,7 @@
             $scope.start = function () {
                 $scope.pomodoro.startTS = Math.round(new Date().getTime() / 1000);
                 $scope.stopwatch.start();
-            }
+            };
             $scope.abort = function () {
 
             }
