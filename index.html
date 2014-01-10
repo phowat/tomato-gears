@@ -9,28 +9,46 @@
 
         <!-- Bootstrap core CSS -->
         <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+        <style type="text/css">
+            body {
+                text-align: center;
+                padding-top: 10px;
+            }
+        </style>
     </head>
 
     <body>
-
         <div class="container" ng-controller="PomodoroTimerCtrl">
             <div class="row">
-               <div class="form-group">
-                   <form class="simple-form">
-                       <label for="activityDesc">Activity</label>
-                       <input type="text" class="form-control" ng-model="pomodoro.description" id="activityDesc" placeholder="Ex: Finishing the layout of feature X." required >
-                   </form>
-               </div>
+                <div class="col-lg-3 col-md-3 col-sm-1 col-xs-1"></div>
+                <div class="col-lg-6 col-md-6 col-sm-10 col-xs-10">
+                    <div class="well well-sm">
+                        <form class="simple-form form-inline">
+                            <h3>Activity</h3>
+                            <input type="text" class="form-control" ng-model="pomodoro.description" id="activityDesc" placeholder="Ex: Finishing the layout of feature X." required >
+                        </form>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-1 col-xs-1"></div>
             </div>
             <div class="row">
-               {{ stopwatch.data.value | secToTime }}
-               <div class="btn-group">
-                   <button type="button" class="btn btn-default" ng-click="startAbort()">{{ pomodoro.startTS < 1 ? 'Start' : 'Abort' }}</button>
-                   <button type="button" class="btn btn-default">Long Break</button>
-                   <button type="button" class="btn btn-default">Short Break</button>
-               </div>
-                <div>
-                    <table class="table">
+                <div class="col-lg-4 col-md-4 col-sm-1 col-xs-1"></div>
+                <div class="col-lg-4 col-md-4 col-sm-10 col-xs-10 jumbotron">
+                    <h1> {{ stopwatch.data.value | secToTime }} </h1>
+                    <p class="lead">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default" ng-click="startAbort()">{{ pomodoro.startTS < 1 ? 'Start' : 'Abort' }}</button>
+                            <button type="button" class="btn btn-default">Long Break</button>
+                            <button type="button" class="btn btn-default">Short Break</button>
+                        </div>
+                    </p>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-1 col-xs-1"></div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-1 col-xs-1"></div>
+                <div class="col-lg-8 col-md-8 col-sm-10 col-xs-10">
+                    <table class="table table-bordered table-striped table-hover">
                         <thead>
                         <tr>
                             <th>Start Time</th>
@@ -47,6 +65,7 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="col-lg-2 col-md-2 col-sm-1 col-xs-1"></div>
             </div>
         </div><!-- /.container -->
     </body>
