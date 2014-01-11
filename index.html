@@ -45,7 +45,7 @@ TODO: Desktop notifications
                     <h1> {{ stopwatch.data.value | secToTime }} </h1>
                     <p class="lead">
                         <div class="btn-group">
-                            <button type="button" class="btn btn-default" ng-click="startAbort()">{{ pomodoro.startTS < 1 ? 'Start' : 'Abort' }}</button>
+                            <button type="button" class="btn btn-default" ng-click="startAbort()">{{ pomodoro.startTS < 1 ? pomodoro.action == 'POMODORO'? 'Break' : 'Start' : 'Abort' }}</button>
                             <button type="button" class="btn btn-default">Long Break</button>
                             <button type="button" class="btn btn-default">Short Break</button>
                         </div>
@@ -85,6 +85,7 @@ TODO: Desktop notifications
 
         tomatoGears.factory('PomodoroData', function () {
             return {
+                action: '',
                 startTS: 0,
                 description: '',
                 pomodoroDuration: 1500,
@@ -117,8 +118,17 @@ TODO: Desktop notifications
             var start = function () {
 
                 stopwatch = $timeout(function() {
+                    var duration;
                     data.value = Math.round(new Date().getTime() / 1000) - PomodoroData.startTS;
-                    if (data.value > PomodoroData.pomodoroDuration) {
+                    if (PomodoroData.action === 'POMODORO') {
+                        duration = PomodoroData.pomodoroDuration;
+                    } else if (PomodoroData.action === 'SHORT_BREAK') {
+                        duration = PomodoroData.shortBreakDuration;
+                    } else { //LONG_BREAK
+                        duration = PomodoroData.longBreakDuration;
+                    }
+
+                    if (data.value > duration) {
                         PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].status = "FINISHED";
                         stop();
                     } else {
@@ -163,12 +173,20 @@ TODO: Desktop notifications
                 } else {
                     var startDate = new Date();
                     $scope.pomodoro.startTS = Math.round(startDate.getTime() / 1000);
-                    $scope.pomodoro.pomodoros.push({
-                        startTS: startDate,
-                        description: $scope.pomodoro.description,
-                        status: "IN_PROGRESS"
-                    });
-                    $scope.stopwatch.start();
+
+                    if ($scope.pomodoro.action == 'POMODORO') {
+                        // Start a short break
+                        $scope.pomodoro.action = 'SHORT_BREAK';
+                        $scope.stopwatch.start();
+                    } else {
+                        $scope.pomodoro.action = 'POMODORO';
+                        $scope.pomodoro.pomodoros.push({
+                            startTS: startDate,
+                            description: $scope.pomodoro.description,
+                            status: "IN_PROGRESS"
+                        });
+                        $scope.stopwatch.start();
+                    }
                 }
             };
         });
