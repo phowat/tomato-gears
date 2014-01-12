@@ -45,7 +45,9 @@ TODO: Desktop notifications
                     <h1> {{ stopwatch.data.value | secToTime }} </h1>
                     <p class="lead">
                         <div class="btn-group">
-                            <button type="button" class="btn btn-default" ng-click="startAbort()">{{ pomodoro.startTS < 1 ? pomodoro.action == 'POMODORO'? 'Break' : 'Start' : 'Abort' }}</button>
+                            <button type="button" class="btn btn-default" ng-click="startAbort()">
+                                {{ pomodoro.label }}
+                            </button>
                             <button type="button" class="btn btn-default">Long Break</button>
                             <button type="button" class="btn btn-default">Short Break</button>
                         </div>
@@ -86,10 +88,11 @@ TODO: Desktop notifications
         tomatoGears.factory('PomodoroData', function () {
             return {
                 action: '',
+                label: 'Start',
                 startTS: 0,
                 description: '',
-                pomodoroDuration: 1500,
-                shortBreakDuration: 300,
+                pomodoroDuration: 5,//1500,
+                shortBreakDuration: 3,//300,
                 longBreakDuration: 1200,
                 pomodoros: []
             };
@@ -108,9 +111,11 @@ TODO: Desktop notifications
                 PomodoroData.startTS = 0;
                 data.value = 0;
                 stopwatch = null;
+
             };
 
             var abort = function () {
+                PomodoroData.label = 'Start';
                 PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].status = "ABORTED";
                 stop();
             };
@@ -129,7 +134,12 @@ TODO: Desktop notifications
                     }
 
                     if (data.value > duration) {
-                        PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].status = "FINISHED";
+                        if (PomodoroData.action === 'POMODORO') {
+                            PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].status = "FINISHED";
+                            PomodoroData.label = 'Break';
+                        } else {
+                            PomodoroData.label = 'Start';
+                        }
                         stop();
                     } else {
                         start();
@@ -173,7 +183,7 @@ TODO: Desktop notifications
                 } else {
                     var startDate = new Date();
                     $scope.pomodoro.startTS = Math.round(startDate.getTime() / 1000);
-
+                    $scope.pomodoro.label = 'Abort';
                     if ($scope.pomodoro.action == 'POMODORO') {
                         // Start a short break
                         $scope.pomodoro.action = 'SHORT_BREAK';
