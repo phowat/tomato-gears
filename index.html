@@ -103,8 +103,7 @@ TODO: Desktop notifications
         tomatoGears.factory('Timer', function($timeout, PomodoroData) {
 
             var data = {
-                        value: 0,
-                        laps: []
+                        value: 0
                     },
                     stopwatch = null;
 
@@ -142,8 +141,18 @@ TODO: Desktop notifications
                         if (PomodoroData.action === 'POMODORO') {
                             PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].status = "FINISHED";
                             PomodoroData.label = 'Break';
+                            var instance = new Notification(
+                                    "Pomodoro Finished", {
+                                        body: "Nice job! Now go get some well earned rest."
+                                    }
+                            );
                         } else {
                             PomodoroData.label = 'Start';
+                            var instance = new Notification(
+                                    "Break Finished", {
+                                        body: "Break finished, back to work you slacker!"
+                                    }
+                            );
                         }
                         stop();
                     } else {
@@ -152,22 +161,11 @@ TODO: Desktop notifications
                 }, 100);
             };
 
-            var reset = function () {
-                stop();
-                data.value = 0;
-                data.laps = [];
-            };
-
-            var lap = function () {
-                data.laps.push(data.value);
-            };
 
             return {
                 data: data,
                 start: start,
                 stop: stop,
-                reset: reset,
-                lap: lap,
                 abort: abort
             };
         });
@@ -183,6 +181,10 @@ TODO: Desktop notifications
             $scope.pomodoro = PomodoroData;
             $scope.stopwatch = Timer;
             $scope.startAbort = function () {
+
+                var Notification = window.Notification || window.mozNotification || window.webkitNotification;
+                Notification.requestPermission(function (permission) {});
+
                 if ($scope.pomodoro.startTS > 0) {
                     $scope.stopwatch.abort();
                 } else {
@@ -204,6 +206,9 @@ TODO: Desktop notifications
                     }
                 }
             };
+            $scope.$watch('assignments', function() {
+
+            });
         });
     </script>
 </html>
