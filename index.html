@@ -120,53 +120,52 @@ TODO: Add notes about what was done on a pomodoro
                 stop();
             };
 
-            var start = function () {
+            var decideDuration = function() {
+                if (PomodoroData.action === 'POMODORO') {
+                    return PomodoroData.pomodoroDuration;
+                } else if (PomodoroData.action === 'SHORT_BREAK') {
+                    return PomodoroData.shortBreakDuration;
+                } else { //LONG_BREAK
+                    return PomodoroData.longBreakDuration;
+                }
+            };
 
-                stopwatch = $timeout(function() {
-                    var duration;
-                    data.value = Math.round(new Date().getTime() / 1000) - PomodoroData.startTS;
-                    if (PomodoroData.action === 'POMODORO') {
-                        duration = PomodoroData.pomodoroDuration;
-                    } else if (PomodoroData.action === 'SHORT_BREAK') {
-                        duration = PomodoroData.shortBreakDuration;
-                    } else { //LONG_BREAK
-                        duration = PomodoroData.longBreakDuration;
+            var finish = function () {
+                if (PomodoroData.action === 'POMODORO') {
+                    PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].status = "FINISHED";
+                    PomodoroData.pcount++;
+                    if (PomodoroData.pcount % 4 === 0) {
+                        PomodoroData.label = 'Long break';
+                    } else {
+                        PomodoroData.label = 'Short Break';
                     }
+                    new Notification("Pomodoro Finished", {
+                        body: "Nice job! Now go get some well earned rest."
+                    });
+                } else {
+                    PomodoroData.label = 'Start Pomodoro';
+                    new Notification("Break Finished", {
+                        body: "Break finished, back to work you slacker!"
+                    });
+                }
+                stop();
+            };
+            var timerLoop = function () {
+                stopwatch = $timeout(function() {
+                    var duration = decideDuration();
+                    data.value = Math.round(new Date().getTime() / 1000) - PomodoroData.startTS;
 
                     if (data.value > duration) {
-                        var instance;
-                        if (PomodoroData.action === 'POMODORO') {
-                            PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].status = "FINISHED";
-                            PomodoroData.pcount++;
-                            if (PomodoroData.pcount % 4 === 0) {
-                                PomodoroData.label = 'Long break';
-                            } else {
-                                PomodoroData.label = 'Short Break';
-                            }
-                            instance = new Notification(
-                                    "Pomodoro Finished", {
-                                        body: "Nice job! Now go get some well earned rest."
-                                    }
-                            );
-                        } else {
-                            PomodoroData.label = 'Start Pomodoro';
-                            instance = new Notification(
-                                    "Break Finished", {
-                                        body: "Break finished, back to work you slacker!"
-                                    }
-                            );
-                        }
-                        stop();
+                        finish();
                     } else {
-                        start();
+                        timerLoop();
                     }
                 }, 100);
             };
 
-
             return {
                 data: data,
-                start: start,
+                timerLoop: timerLoop,
                 stop: stop,
                 abort: abort
             };
@@ -208,7 +207,6 @@ TODO: Add notes about what was done on a pomodoro
                         } else {
                             $scope.pomodoro.action = 'SHORT_BREAK';
                         }
-                        $scope.stopwatch.start();
                     } else {
                         $scope.pomodoro.action = 'POMODORO';
                         $scope.pomodoro.pomodoros.push({
@@ -216,8 +214,8 @@ TODO: Add notes about what was done on a pomodoro
                             description: $scope.pomodoro.description,
                             status: "IN_PROGRESS"
                         });
-                        $scope.stopwatch.start();
                     }
+                    $scope.stopwatch.timerLoop();
                 }
             };
         });
