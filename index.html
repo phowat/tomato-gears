@@ -3,6 +3,8 @@
 TODO: The pomodoro table should show different status pomodoros with different colors or something. Maybe create a directive for that
 TODO: Export / import data
 TODO: HTML5 local storage
+TODO: We should be able to edit the description of pomodoros
+TODO: Add notes about what was done on a pomodoro
 -->
 <html lang="en" ng-app="tomatoGears">
     <head>
@@ -83,7 +85,7 @@ TODO: HTML5 local storage
         tomatoGears.factory('PomodoroData', function () {
             return {
                 action: '',
-                label: 'Start',
+                label: 'Start Pomodoro',
                 startTS: 0,
                 description: '',
                 pomodoroDuration: 5, //1500,
@@ -114,7 +116,7 @@ TODO: HTML5 local storage
                 if (PomodoroData.action === 'POMODORO') {
                     PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].status = "ABORTED";
                 }
-                PomodoroData.label = 'Start';
+                PomodoroData.label = 'Start Pomodoro';
                 stop();
             };
 
@@ -147,7 +149,7 @@ TODO: HTML5 local storage
                                     }
                             );
                         } else {
-                            PomodoroData.label = 'Start';
+                            PomodoroData.label = 'Start Pomodoro';
                             instance = new Notification(
                                     "Break Finished", {
                                         body: "Break finished, back to work you slacker!"
