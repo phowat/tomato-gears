@@ -1,11 +1,8 @@
 <!DOCTYPE html>
 <!--
-TODO: Short and long break flow. Let's have just one button ( start pomodoro, changes to abort, changes to start short pause ... maybe a skip button to let people skip pauses )
 TODO: The pomodoro table should show different status pomodoros with different colors or something. Maybe create a directive for that
 TODO: Export / import data
 TODO: HTML5 local storage
-TODO: Play sound when pomodoro finishes.
-TODO: Desktop notifications
 -->
 <html lang="en" ng-app="tomatoGears">
     <head>
@@ -46,13 +43,9 @@ TODO: Desktop notifications
                 <div class="col-lg-4 col-md-4 col-sm-10 col-xs-10 jumbotron">
                     <h1> {{ stopwatch.data.value | secToTime }} </h1>
                     <p class="lead">
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default" ng-click="startAbort()">
-                                {{ pomodoro.label }}
-                            </button>
-                            <button type="button" class="btn btn-default">Long Break</button>
-                            <button type="button" class="btn btn-default">Short Break</button>
-                        </div>
+                        <button type="button" class="btn btn-default" ng-click="startAbort()">
+                            {{ pomodoro.label }}
+                        </button>
                     </p>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-1 col-xs-1"></div>
@@ -95,8 +88,9 @@ TODO: Desktop notifications
                 description: '',
                 pomodoroDuration: 5, //1500,
                 shortBreakDuration: 3,//300,
-                longBreakDuration: 1200,
-                pomodoros: []
+                longBreakDuration: 4, //1200,
+                pomodoros: [],
+                pcount: 0
             };
         });
 
@@ -138,17 +132,23 @@ TODO: Desktop notifications
                     }
 
                     if (data.value > duration) {
+                        var instance;
                         if (PomodoroData.action === 'POMODORO') {
                             PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].status = "FINISHED";
-                            PomodoroData.label = 'Break';
-                            var instance = new Notification(
+                            PomodoroData.pcount++;
+                            if (PomodoroData.pcount % 4 === 0) {
+                                PomodoroData.label = 'Long break';
+                            } else {
+                                PomodoroData.label = 'Short Break';
+                            }
+                            instance = new Notification(
                                     "Pomodoro Finished", {
                                         body: "Nice job! Now go get some well earned rest."
                                     }
                             );
                         } else {
                             PomodoroData.label = 'Start';
-                            var instance = new Notification(
+                            instance = new Notification(
                                     "Break Finished", {
                                         body: "Break finished, back to work you slacker!"
                                     }
@@ -182,6 +182,7 @@ TODO: Desktop notifications
             $scope.stopwatch = Timer;
             $scope.startAbort = function () {
 
+                // Request permission for future notifications
                 var Notification = window.Notification || window.mozNotification || window.webkitNotification;
                 Notification.requestPermission(function (permission) {});
 
@@ -191,9 +192,20 @@ TODO: Desktop notifications
                     var startDate = new Date();
                     $scope.pomodoro.startTS = Math.round(startDate.getTime() / 1000);
                     $scope.pomodoro.label = 'Abort';
-                    if ($scope.pomodoro.action == 'POMODORO') {
+
+                    var lastStatus = 'xx';
+                    var plen = $scope.pomodoro.pomodoros.length;
+                    if (plen > 0) {
+                        lastStatus = $scope.pomodoro.pomodoros[plen-1].status;
+                    }
+
+                    if (($scope.pomodoro.action === 'POMODORO') && (lastStatus !== 'ABORTED')) {
                         // Start a short break
-                        $scope.pomodoro.action = 'SHORT_BREAK';
+                        if (($scope.pomodoro.pcount > 0) && ($scope.pomodoro.pcount % 4 === 0)) {
+                            $scope.pomodoro.action = 'LONG_BREAK';
+                        } else {
+                            $scope.pomodoro.action = 'SHORT_BREAK';
+                        }
                         $scope.stopwatch.start();
                     } else {
                         $scope.pomodoro.action = 'POMODORO';
@@ -206,9 +218,6 @@ TODO: Desktop notifications
                     }
                 }
             };
-            $scope.$watch('assignments', function() {
-
-            });
         });
     </script>
 </html>
