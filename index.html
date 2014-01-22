@@ -59,14 +59,14 @@ TODO: Add notes about what was done on a pomodoro
                         <tr>
                             <th>Start Time</th>
                             <th>Description</th>
-                            <th>Pomodoros</th>
+                            <th>Status</th>
                         </tr>
                         </thead>
                         <tbody ng-repeat="p in pomodoro.pomodoros">
                         <tr>
                             <td> {{ p.startTS | date:'HH:mm:ss' }} </td>
                             <td> <input type="text" value="{{ p.description }}"> </td>
-                            <td> {{ p.status }} </td>
+                            <td> {{ p.status == 'ABORTED' ? p.status + ' - ' + (p.endTS | date: 'HH:mm:ss') : p.status }} </td>
                         </tr>
                         </tbody>
                     </table>
@@ -114,6 +114,8 @@ TODO: Add notes about what was done on a pomodoro
             var abort = function () {
                 if (PomodoroData.action === 'POMODORO') {
                     PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].status = "ABORTED";
+                    PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].endTS =  new Date();
+
                 }
                 PomodoroData.label = 'Start Pomodoro';
                 stop();
@@ -211,7 +213,8 @@ TODO: Add notes about what was done on a pomodoro
                         $scope.pomodoro.pomodoros.push({
                             startTS: startDate,
                             description: $scope.pomodoro.description,
-                            status: "IN_PROGRESS"
+                            status: "IN_PROGRESS",
+                            endTS: undefined
                         });
                     }
                     $scope.stopwatch.timerLoop();
