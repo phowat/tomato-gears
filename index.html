@@ -3,7 +3,6 @@
 TODO: The pomodoro table should show different status pomodoros with different colors or something. Maybe create a directive for that
 TODO: Export / import data
 TODO: HTML5 local storage
-TODO: We should be able to edit the description of pomodoros
 TODO: Add notes about what was done on a pomodoro
 -->
 <html lang="en" ng-app="tomatoGears">
@@ -66,7 +65,7 @@ TODO: Add notes about what was done on a pomodoro
                         <tbody ng-repeat="p in pomodoro.pomodoros">
                         <tr>
                             <td> {{ p.startTS | date:'HH:mm:ss' }} </td>
-                            <td> {{ p.description }} </td>
+                            <td> <input type="text" value="{{ p.description }}"> </td>
                             <td> {{ p.status }} </td>
                         </tr>
                         </tbody>
