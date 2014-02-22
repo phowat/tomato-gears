@@ -25,8 +25,10 @@ TODO: Add notes about what was done on a pomodoro
 
     <body>
     <audio id="alert-audio" src="ringtone.wav" preload="auto"></audio>
-
-    <div class="container" ng-controller="PomodoroTimerCtrl">
+    <a href="https://github.com/phowat/tomato-gears">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+    </a>
+    <div class="container" ng-controller="PomodoroTimerCtrl" ng-init="init()">
             <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-1 col-xs-1"></div>
                 <div class="col-lg-6 col-md-6 col-sm-10 col-xs-10">
@@ -72,7 +74,8 @@ TODO: Add notes about what was done on a pomodoro
                     </table>
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-1 col-xs-1"></div>
-                <a href="{{ pomodoro.pomodoros | toCSV }}" id="export-activty">Export</a>
+                <a href="{{ pomodoro.pomodoros | toCSV }}" id="export-activty">Export</a> <br/>
+                <a href="#" id="reset-pomodoros" ng-click="resetPomodoros()">Reset Pomodoros</a>
             </div>
         </div><!-- /.container -->
     </body>

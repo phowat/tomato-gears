@@ -37,7 +37,7 @@ tomatoGears.factory('Timer', function($timeout, PomodoroData) {
         if (PomodoroData.action === 'POMODORO') {
             PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].status = "ABORTED";
             PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].endTS =  new Date();
-
+            localStorage['pomodoros'] = JSON.stringify(PomodoroData.pomodoros);
         }
         PomodoroData.label = 'Start Pomodoro';
         stop();
@@ -56,6 +56,7 @@ tomatoGears.factory('Timer', function($timeout, PomodoroData) {
     var finish = function () {
         if (PomodoroData.action === 'POMODORO') {
             PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].status = "FINISHED";
+            localStorage['pomodoros'] = JSON.stringify(PomodoroData.pomodoros);
             PomodoroData.pcount++;
             if (PomodoroData.pcount % 4 === 0) {
                 PomodoroData.label = 'Long break';
@@ -153,8 +154,32 @@ tomatoGears.controller('PomodoroTimerCtrl', function ($scope, PomodoroData, Time
                     status: "IN_PROGRESS",
                     endTS: undefined
                 });
+                localStorage['pomodoros'] = JSON.stringify($scope.pomodoro.pomodoros);
             }
             $scope.stopwatch.timerLoop();
         }
+    };
+
+    $scope.resetPomodoros = function() {
+        localStorage.clear();
+        window.location.href = "/";
+    };
+
+    $scope.init = function() {
+
+        if (localStorage['pomodoros'] !== undefined) {
+            _.each(JSON.parse(localStorage['pomodoros']), function(el) {
+                if (el.status === 'IN_PROGRESS') {
+                    el.status = 'ABORTED';
+                }
+                $scope.pomodoro.pomodoros.push({
+                    startTS: el.startTS,
+                    description: el.description,
+                    status: el.status,
+                    endTS: el.endTS,
+                });
+            });
+        }
+
     };
 });
