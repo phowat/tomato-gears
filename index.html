@@ -20,6 +20,13 @@ TODO: Add notes about what was done on a pomodoro
                 text-align: center;
                 padding-top: 10px;
             }
+            p.small-label {
+                font-size: 0.8em;
+                margin-bottom: 0;
+            }
+            h1.timer {
+                margin-top: 0;
+            }
         </style>
     </head>
 
@@ -44,7 +51,8 @@ TODO: Add notes about what was done on a pomodoro
             <div class="row">
                 <div class="col-lg-4 col-md-4 col-sm-1 col-xs-1"></div>
                 <div class="col-lg-4 col-md-4 col-sm-10 col-xs-10 jumbotron">
-                    <h1> {{ stopwatch.data.value | secToTime }} </h1>
+                    <p class="small-label"> {{ pomodoro.text }} </p>
+                    <h1 class="timer"> {{ stopwatch.data.value | secToTime }} </h1>
                     <p class="lead">
                         <button type="button" class="btn btn-default" ng-click="startAbort()">
                             {{ pomodoro.label }}

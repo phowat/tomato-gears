@@ -7,6 +7,7 @@ tomatoGears.factory('PomodoroData', function () {
     return {
         action: '',
         label: 'Start Pomodoro',
+        text: '',
         startTS: 0,
         description: '',
         pomodoroDuration: 1500,
@@ -36,6 +37,7 @@ tomatoGears.factory('Timer', function($timeout, PomodoroData) {
     var abort = function () {
         if (PomodoroData.action === 'POMODORO') {
             PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].status = "ABORTED";
+            PomodoroData.text = '';
             PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].endTS =  new Date();
             localStorage['pomodoros'] = JSON.stringify(PomodoroData.pomodoros);
         }
@@ -56,6 +58,7 @@ tomatoGears.factory('Timer', function($timeout, PomodoroData) {
     var finish = function () {
         if (PomodoroData.action === 'POMODORO') {
             PomodoroData.pomodoros[PomodoroData.pomodoros.length-1].status = "FINISHED";
+            PomodoroData.text = '';
             localStorage['pomodoros'] = JSON.stringify(PomodoroData.pomodoros);
             PomodoroData.pcount++;
             if (PomodoroData.pcount % 4 === 0) {
@@ -122,6 +125,18 @@ tomatoGears.controller('PomodoroTimerCtrl', function ($scope, PomodoroData, Time
     $scope.stopwatch = Timer;
     $scope.startAbort = function () {
 
+	var action2text = function(action) {
+        switch (action) {
+            case 'LONG_BREAK':
+                return 'Long Break';
+            case 'SHORT BREAK':
+                return 'Break';
+            case 'POMODORO':
+                return 'Pomodoro';
+            default:
+                return '';
+        }
+    } 
         // Request permission for future notifications
         var Notification = window.Notification || window.mozNotification || window.webkitNotification;
         Notification.requestPermission(function (permission) {});
@@ -156,6 +171,7 @@ tomatoGears.controller('PomodoroTimerCtrl', function ($scope, PomodoroData, Time
                 });
                 localStorage['pomodoros'] = JSON.stringify($scope.pomodoro.pomodoros);
             }
+            $scope.pomodoro.text = action2text($scope.pomodoro.action);
             $scope.stopwatch.timerLoop();
         }
     };
@@ -171,6 +187,7 @@ tomatoGears.controller('PomodoroTimerCtrl', function ($scope, PomodoroData, Time
             _.each(JSON.parse(localStorage['pomodoros']), function(el) {
                 if (el.status === 'IN_PROGRESS') {
                     el.status = 'ABORTED';
+                    $scope.pomodoro.text = '';
                 }
                 $scope.pomodoro.pomodoros.push({
                     startTS: el.startTS,
